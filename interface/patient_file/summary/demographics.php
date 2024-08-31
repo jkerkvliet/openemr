@@ -1883,6 +1883,9 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                             'pid' => $pid
                         ]);
                     endif;
+
+                    // to render something after the patient demographic sidebar list
+                    $GLOBALS["kernel"]->getEventDispatcher()->dispatch(new RenderEvent($pid), RenderEvent::EVENT_SECTION_SIDEBAR_RENDER_AFTER, 10);
                     ?>
                 </div> <!-- end right column div -->
             </div> <!-- end div.main > row:first  -->
