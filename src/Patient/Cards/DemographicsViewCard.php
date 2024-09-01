@@ -20,7 +20,7 @@ class DemographicsViewCard extends CardModel
 {
     private const TEMPLATE_FILE = 'patient/card/tab_base.html.twig';
 
-    private const CARD_ID = 'demographic';
+    private const CARD_ID = 'demographics';
 
     private $patientData;
     private $employerData;
