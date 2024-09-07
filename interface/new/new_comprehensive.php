@@ -20,10 +20,11 @@ require_once("$srcdir/patient.inc.php");
 require_once("$srcdir/validation/LBF_Validation.php");
 require_once("$srcdir/patientvalidation.inc.php");
 
+use OpenEMR\Core\Header;
 use OpenEMR\Common\Acl\AclMain;
 use OpenEMR\Common\Csrf\CsrfUtils;
 use OpenEMR\Common\Twig\TwigContainer;
-use OpenEMR\Core\Header;
+use OpenEMR\Events\PatientDemographics\RenderDemographicsNewPatientEvent;
 
 // Check authorization.
 if (!AclMain::aclCheckCore('patients', 'demo', '', array('write','addonly'))) {
@@ -380,6 +381,11 @@ function srchDone(pid){
 </head>
 
 <body class="body_top">
+
+<?php
+    $beforeRenderEvent = new RenderDemographicsNewPatientEvent();
+    $GLOBALS["kernel"]->getEventDispatcher()->dispatch($beforeRenderEvent, RenderDemographicsNewPatientEvent::BEFORE_RENDER, 10);
+?>
 
 <?php
 /*Get the constraint from the DB-> LBF forms accordinf the form_id*/
@@ -1035,5 +1041,6 @@ include_once("$srcdir/validation/validation_script.js.php");?>
         checkSkipConditions();
     });
 </script>
+
 </body>
 </html>

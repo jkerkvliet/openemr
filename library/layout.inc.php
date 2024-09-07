@@ -1,5 +1,7 @@
 <?php
 
+use OpenEMR\Events\Field\SetupDatatypeOptions;
+
 /**
  * Sql functions/classes for OpenEMR.
  *
@@ -83,3 +85,11 @@ $UOR = array(
     1 => xl('Optional'),
     2 => xl('Required'),
 );
+
+// this allows a module to edit each of the above arrays
+$setupDatatypeEvent = new SetupDatatypeOptions($datatypes, $typesUsingList, $sources, $UOR);
+$GLOBALS["kernel"]->getEventDispatcher()->dispatch($setupDatatypeEvent, SetupDatatypeOptions::EVENT_HANDLE, 10);
+$datatypes = $setupDatatypeEvent->getDatatypes();
+$typesUsingList = $setupDatatypeEvent->getTypesUsingList();
+$sources = $setupDatatypeEvent->getSources();
+$UOR = $setupDatatypeEvent->getUOR();

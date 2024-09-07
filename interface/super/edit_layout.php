@@ -831,15 +831,8 @@ function writeFieldLine($linedata)
     echo "</td>\n";
 
     echo "  <td class='text-center optcell'>";
-    if (
-        $linedata['data_type'] ==  1 || $linedata['data_type'] == 21 ||
-        $linedata['data_type'] == 22 || $linedata['data_type'] == 23 ||
-        $linedata['data_type'] == 25 || $linedata['data_type'] == 26 ||
-        $linedata['data_type'] == 27 || $linedata['data_type'] == 32 ||
-        $linedata['data_type'] == 33 || $linedata['data_type'] == 34 ||
-        $linedata['data_type'] == 36 || $linedata['data_type'] == 37 ||
-        $linedata['data_type'] == 43 || $linedata['data_type'] == 46
-    ) {
+    global $typesUsingList;
+    if (in_array($linedata['data_type'], $typesUsingList)) {
         $type = "";
         $disp = "style='display: none'";
         if ($linedata['data_type'] == 34) {

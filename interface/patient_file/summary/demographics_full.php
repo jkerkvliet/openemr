@@ -20,11 +20,12 @@ require_once("$srcdir/patientvalidation.inc.php");
 require_once("$srcdir/pid.inc.php");
 require_once("$srcdir/patient.inc.php");
 
-use OpenEMR\Common\Acl\AclMain;
-use OpenEMR\Common\Forms\FormActionBarSettings;
-use OpenEMR\Common\Csrf\CsrfUtils;
 use OpenEMR\Core\Header;
+use OpenEMR\Common\Acl\AclMain;
+use OpenEMR\Common\Csrf\CsrfUtils;
+use OpenEMR\Common\Forms\FormActionBarSettings;
 use OpenEMR\Events\PatientDemographics\UpdateEvent;
+use OpenEMR\Events\PatientDemographics\RenderDemographicsEditEvent;
 
 // Session pid must be right or bad things can happen when demographics are saved!
 //
@@ -59,6 +60,7 @@ if ($pid) {
 }
 
 $CPR = 4; // cells per row
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -68,6 +70,11 @@ $CPR = 4; // cells per row
 <title><?php echo xlt('Edit Current Patient'); ?></title>
 
 <?php include_once($GLOBALS['srcdir'] . "/options.js.php"); ?>
+
+<?php
+    $beforeRenderEvent = new RenderDemographicsEditEvent($pid);
+    $GLOBALS["kernel"]->getEventDispatcher()->dispatch($beforeRenderEvent, RenderDemographicsEditEvent::BEFORE_RENDER, 10);
+?>
 
 <script>
 

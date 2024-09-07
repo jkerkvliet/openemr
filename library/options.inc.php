@@ -54,14 +54,17 @@ require_once("patient.inc.php");
 require_once("lists.inc.php");
 require_once(dirname(dirname(__FILE__)) . "/custom/code_types.inc.php");
 
-use OpenEMR\Common\Acl\AclExtended;
 use OpenEMR\Common\Acl\AclMain;
+use OpenEMR\Common\Acl\AclExtended;
+use OpenEMR\Services\PatientService;
+use OpenEMR\Services\FacilityService;
+use OpenEMR\Services\EncounterService;
 use OpenEMR\Common\Layouts\LayoutsUtils;
 use OpenEMR\Common\Forms\Types\BillingCodeType;
+use OpenEMR\Events\Field\GenerateFormFieldEvent;
+use OpenEMR\Events\Field\GeneratePrintFieldEvent;
+use OpenEMR\Events\Field\GenerateDisplayFieldEvent;
 use OpenEMR\Common\Forms\Types\LocalProviderListType;
-use OpenEMR\Services\EncounterService;
-use OpenEMR\Services\FacilityService;
-use OpenEMR\Services\PatientService;
 use OpenEMR\Events\PatientDemographics\RenderPharmacySectionEvent;
 
 $facilityService = new FacilityService();
@@ -73,6 +76,7 @@ $membership_group_number = 0;
 // Using col-lg allow us to have additional breakpoint at col-md.(992px, 768px)
 // col-md-auto will let BS decide with col-12 always for sm devices.
 $BS_COL_CLASS = 'col-12 col-md-auto col-lg';
+$dispatcher = $GLOBALS['kernel']->getEventDispatcher();
 
 function get_pharmacies()
 {
@@ -554,7 +558,7 @@ function genLabResults($frow, $currvalue, $outtype = 0, $disabled = '')
 //
 function generate_form_field($frow, $currvalue)
 {
-    global $rootdir, $date_init, $ISSUE_TYPES, $code_types, $membership_group_number;
+    global $rootdir, $date_init, $ISSUE_TYPES, $code_types, $membership_group_number, $dispatcher;
 
     $currescaped = htmlspecialchars($currvalue ?? '', ENT_QUOTES);
 
@@ -1661,11 +1665,15 @@ function generate_form_field($frow, $currvalue)
     } elseif ($data_type == 54) {
         include "templates/address_list_form.php";
     }
+
+    // if anyone wants to add a field type or add something after a field is created, they would need to listen to this event
+    $generateFieldEvent = new GenerateFormFieldEvent($frow, $currvalue);
+    $dispatcher->dispatch($generateFieldEvent, GenerateFormFieldEvent::EVENT_HANDLE, 10);
 }
 
 function generate_print_field($frow, $currvalue, $value_allowed = true)
 {
-    global $rootdir, $date_init, $ISSUE_TYPES;
+    global $rootdir, $date_init, $ISSUE_TYPES, $dispatcher;
 
     $currescaped = htmlspecialchars($currvalue, ENT_QUOTES);
 
@@ -2353,6 +2361,10 @@ function generate_print_field($frow, $currvalue, $value_allowed = true)
             echo '&nbsp;';
         }
     }
+
+    // if anyone wants to add a field type or add something after a field is created, they would need to listen to this event
+    $generateFieldEvent = new GeneratePrintFieldEvent($frow, $currvalue);
+    $dispatcher->dispatch($generateFieldEvent, GeneratePrintFieldEvent::EVENT_HANDLE, 10);
 }
 
 /**
@@ -2385,7 +2397,7 @@ function generate_list_map($list_id, $translate = false)
 
 function generate_display_field($frow, $currvalue)
 {
-    global $ISSUE_TYPES, $facilityService;
+    global $ISSUE_TYPES, $facilityService, $dispatcher;
 
     $data_type  = $frow['data_type'];
     $field_id   = isset($frow['field_id'])  ? $frow['field_id'] : null;
@@ -2880,6 +2892,11 @@ function generate_display_field($frow, $currvalue)
     } elseif ($data_type == 54) {
         include "templates/address_list_display.php";
     }
+
+    // if anyone wants to add a field type or add something after a field is created, they would need to listen to this event
+    $generateFieldEvent = new GenerateDisplayFieldEvent($frow, $currvalue, $s);
+    $dispatcher->dispatch($generateFieldEvent, GenerateDisplayFieldEvent::EVENT_HANDLE, 10);
+    $s = $generateFieldEvent->getHtml(); // in case it was modified by the event
 
     return $s;
 }
