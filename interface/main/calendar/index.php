@@ -23,6 +23,7 @@ require_once 'includes/pnAPI.php';
 
 use OpenEMR\Common\Acl\AclMain;
 use OpenEMR\Common\Session\SessionUtil;
+use OpenEMR\Events\Appointments\CalendarRenderEvent;
 
 // these will be used in below SessionUtil::setSession to set applicable session variables
 $sessionSetArray = [];
@@ -184,5 +185,8 @@ if ((empty($return)) || ($return == false)) {
 } else {
     // duh?
 }
+
+$eventDispatcher = $GLOBALS['kernel']->getEventDispatcher();
+$eventDispatcher->dispatch(new CalendarRenderEvent(), CalendarRenderEvent::RENDER_BELOW_CALENDAR, 10);
 
 exit;
