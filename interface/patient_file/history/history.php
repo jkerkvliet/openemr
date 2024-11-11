@@ -103,6 +103,7 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
             ?>
         </div>
     </div>
+    <!-- Add an event with output here; pass the history result and allow it to be modified (and also allow stuff to be echo'd) -->
     <?php
     if (AclMain::aclCheckCore('patients', 'med', '', array('write','addonly'))) {?>
         <div class="row">
