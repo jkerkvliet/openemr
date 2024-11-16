@@ -15,10 +15,11 @@ require_once("$srcdir/patient.inc.php");
 require_once("history.inc.php");
 require_once("$srcdir/options.inc.php");
 
-use OpenEMR\Common\Acl\AclMain;
 use OpenEMR\Core\Header;
-use OpenEMR\Menu\PatientMenuRole;
 use OpenEMR\OeUI\OemrUI;
+use OpenEMR\Common\Acl\AclMain;
+use OpenEMR\Menu\PatientMenuRole;
+use OpenEMR\Events\PatientDemographics\HistoryRenderEvent;
 
 ?>
 <html>
@@ -103,8 +104,9 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
             ?>
         </div>
     </div>
-    <!-- Add an event with output here; pass the history result and allow it to be modified (and also allow stuff to be echo'd) -->
+
     <?php
+
     if (AclMain::aclCheckCore('patients', 'med', '', array('write','addonly'))) {?>
         <div class="row">
             <div class="col-sm-12">
@@ -115,6 +117,9 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
         $list_id = "history"; // to indicate nav item is active, count and give correct id
         $menuPatient = new PatientMenuRole();
         $menuPatient->displayHorizNavBarMenu();
+
+        $eventDispatcher = $GLOBALS['kernel']->getEventDispatcher();
+        $eventDispatcher->dispatch(new HistoryRenderEvent($pid), HistoryRenderEvent::RENDER_ABOVE_HISTORY, 10);
         ?>
         <div class="row">
             <div class="col-sm-12">
