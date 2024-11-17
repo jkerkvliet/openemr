@@ -58,4 +58,9 @@ class AppointmentSetEvent extends Event
     {
         $this->eid = $eid;
     }
+
+    public function getEventId()
+    {
+        return $this->eid;
+    }
 }
