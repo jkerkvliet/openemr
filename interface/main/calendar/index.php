@@ -81,14 +81,6 @@ if (isset($_GET['pc_facility'])) {
     $sessionSetArray['pc_facility'] = $_GET['pc_facility'];
 }
 
-if ($GLOBALS['set_facility_cookie']) {
-    if (!$GLOBALS['login_into_facility'] && $_SESSION['pc_facility'] > 0) {
-        // If login_into_facility is turn on $_COOKIE['pc_facility'] was saved in the login process.
-        // In the case that login_into_facility is turn on you don't want to save different facility than the selected in the login screen.
-        setcookie("pc_facility", $_SESSION['pc_facility'], time() + (3600 * 365));
-    }
-}
-
 // Simplifying by just using request variable instead of checking for both post and get - KHY
 if (isset($_REQUEST['viewtype'])) {
     $sessionSetArray['viewtype'] = $_REQUEST['viewtype'];
@@ -96,6 +88,14 @@ if (isset($_REQUEST['viewtype'])) {
 
 // Set the session variables
 SessionUtil::setSession($sessionSetArray);
+
+if ($GLOBALS['set_facility_cookie']) {
+    if (!$GLOBALS['login_into_facility'] && $_SESSION['pc_facility'] > 0) {
+        // If login_into_facility is turn on $_COOKIE['pc_facility'] was saved in the login process.
+        // In the case that login_into_facility is turn on you don't want to save different facility than the selected in the login screen.
+        setcookie("pc_facility", $_SESSION['pc_facility'], time() + (3600 * 365));
+    }
+}
 
 // start PN
 pnInit();
