@@ -464,6 +464,9 @@ if (!empty($_POST['form_action']) && ($_POST['form_action'] == "save")) {
         // what is multiple key around this $eid?
         $row = sqlQuery("SELECT pc_multiple FROM openemr_postcalendar_events WHERE pc_eid = ?", array($eid));
 
+        $patientAppointmentBeforeSaveEvent = new AppointmentSetEvent($eid);
+        $eventDispatcher->dispatch($patientAppointmentBeforeSaveEvent, AppointmentSetEvent::BEFORE_SAVE, 10);
+
         // ====================================
         // multiple providers
         // ====================================

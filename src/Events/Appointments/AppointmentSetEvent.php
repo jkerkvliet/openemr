@@ -30,6 +30,11 @@ class AppointmentSetEvent extends Event
     const EVENT_HANDLE = 'appointment.set';
 
     /**
+     * This event is immediately before a new patient appointment has been updated
+     */
+    const BEFORE_SAVE = 'appointment.set.before_save';
+
+    /**
      * @var
      */
     private $post;
