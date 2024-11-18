@@ -16,16 +16,17 @@
 require_once("$srcdir/options.inc.php");
 require_once("$srcdir/lists.inc.php");
 
-use OpenEMR\Billing\MiscBillingOptions;
-use OpenEMR\Common\Acl\AclExtended;
-use OpenEMR\Common\Acl\AclMain;
-use OpenEMR\Common\Csrf\CsrfUtils;
 use OpenEMR\Core\Header;
-use OpenEMR\Services\FacilityService;
+use OpenEMR\OeUI\OemrUI;
+use OpenEMR\Common\Acl\AclMain;
 use OpenEMR\Services\ListService;
 use OpenEMR\Services\UserService;
-use OpenEMR\OeUI\OemrUI;
+use OpenEMR\Common\Csrf\CsrfUtils;
+use OpenEMR\Common\Acl\AclExtended;
+use OpenEMR\Services\FacilityService;
+use OpenEMR\Billing\MiscBillingOptions;
 use OpenEMR\OeUI\RenderFormFieldHelper;
+use OpenEMR\Events\Encounter\NewEncounterRenderEvent;
 
 $facilityService = new FacilityService();
 
@@ -844,6 +845,10 @@ $ires = sqlStatement("SELECT id, type, title, begdate FROM lists WHERE " .
     });
 
 </script>
+
+<?php
+    $GLOBALS["kernel"]->getEventDispatcher()->dispatch(new NewEncounterRenderEvent($pid), NewEncounterRenderEvent::EVENT_SECTION_RENDER_POST, 10);
+?>
 
 <?php if (!empty($GLOBALS['text_templates_enabled'])) { ?>
     <script src="<?php echo $GLOBALS['web_root'] ?>/library/js/CustomTemplateLoader.js"></script>
