@@ -53,6 +53,8 @@ class Signature implements SignatureIF
         $uid,
         $firstName,
         $lastName,
+        $suffix,
+        $valedictory,
         $datetime,
         $hash,
         $amendment = null,
@@ -66,6 +68,8 @@ class Signature implements SignatureIF
         $this->firstName = $firstName;
         $this->lastName = $lastName;
         $this->datetime = $datetime;
+        $this->suffix = $suffix;
+        $this->valedictory = $valedictory;
         $this->hash = $hash;
         $this->amendment = $amendment;
         $this->signatureHash = $signatureHash;
