@@ -29,4 +29,7 @@ ccdaservice/node_modules
 coverage/js-unit
 
 # sqlconf
-sites/default/sqlconf.php
+sites/default/*
+
+# modules
+interface/modules/custom_modules/*
