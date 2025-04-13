@@ -35,4 +35,4 @@ sites/default/*
 interface/modules/custom_modules/*
 
 # cursor
-.cursor/rules
+.cursor/*

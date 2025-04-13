@@ -4,7 +4,9 @@ globs:
 alwaysApply: true
 ---
 
-# Whenever making database requests
+# Whenever working with the database
 
 - Review the schema file [schema.sql](mdc:interface/modules/custom_modules/air-liquide-module/schema.sql) for the database structure
 - Please use sqlStatement, sqlQuery, sqlInsert (etc) when making database calls.  You can see examples of this in [slots.php](mdc:interface/modules/custom_modules/air-liquide-module/api/engage/slots.php).
+- The identification column in patient_data is "pid"
+- Never create new databases with foreign keys.  Only use indexed integer columns.
