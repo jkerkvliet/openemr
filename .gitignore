@@ -33,3 +33,6 @@ sites/default/*
 
 # modules
 interface/modules/custom_modules/*
+
+# cursor
+.cursor/rules
