@@ -1428,6 +1428,8 @@ $oemr_ui = new OemrUI($arrOeUiSettings);
                         }
                     }
 
+                    $GLOBALS["kernel"]->getEventDispatcher()->dispatch(new RenderEvent($pid), RenderEvent::EVENT_SECTION_SIDEBAR_RENDER_BEFORE, 10);
+
                     $sectionRenderEvents = $ed->dispatch(new SectionEvent('secondary'), SectionEvent::EVENT_HANDLE);
                     $sectionCards = $sectionRenderEvents->getCards();
 
