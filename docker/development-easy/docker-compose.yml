@@ -22,6 +22,8 @@ services:
     volumes:
       - ../..:/openemr:ro
       - ../..:/var/www/localhost/htdocs/openemr:rw
+      - ./docker-overrides/empty-git:/var/www/localhost/htdocs/openemr/.git
+      - ./docker-overrides/empty-git:/var/www/localhost/htdocs/openemr/interface/modules/custom_modules/air-liquide-module/.git
       - assetvolume:/var/www/localhost/htdocs/openemr/public/assets:rw
       - themevolume:/var/www/localhost/htdocs/openemr/public/themes:rw
       - sitesvolume:/var/www/localhost/htdocs/openemr/sites:rw
