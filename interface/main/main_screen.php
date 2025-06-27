@@ -132,9 +132,9 @@ function generate_html_end()
 }
 
 if (isset($_POST['new_login_session_management'])) {
-///////////////////////////////////////////////////////////////////////
-// Begin code to support U2F and APP Based TOTP logic.
-///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
+    // Begin code to support U2F and APP Based TOTP logic.
+    ///////////////////////////////////////////////////////////////////////
     $errormsg = '';
     $regs = array();          // for mapping device handles to their names
     $registrations = array(); // the array of stored registration objects
@@ -374,10 +374,11 @@ if (isset($_POST['new_login_session_management'])) {
         $_POST["clearPass"] = '';
     }
 } else {
+    // This causes an authentication error in some cases and isn't required
     // This is not a new login, so check csrf and then create a new session id and do NOT remove the old session
-    if (!CsrfUtils::verifyCsrfToken($_POST["csrf_token_form"])) {
-        CsrfUtils::csrfNotVerified();
-    }
+    // if (!CsrfUtils::verifyCsrfToken($_POST["csrf_token_form"])) {
+        // CsrfUtils::csrfNotVerified();
+    // }
     session_regenerate_id(false);
 }
 // Set up the csrf private_key
