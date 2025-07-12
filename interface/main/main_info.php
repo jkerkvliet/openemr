@@ -42,14 +42,7 @@ if (isset($_SESSION['pc_username'])) {
     }
 }
 
-// different frame source page depending on session vars
-if ($_SESSION['userauthorized'] && $GLOBALS['docs_see_entire_calendar']) {
-    $framesrc = "calendar/index.php?module=PostCalendar&viewtype=" . attr_url($viewtype) . "&func=view";
-} elseif ($_SESSION['userauthorized']) {
-    $framesrc = "calendar/index.php?module=PostCalendar&viewtype=" . attr_url($viewtype) . "&func=view&" . $pcuStr;
-} else {
-    $framesrc = "calendar/index.php?module=PostCalendar&func=view&viewtype=" . attr_url($viewtype);
-}
+$framesrc = "../modules/custom_modules/air-liquide-module/calendar/calendar.php";
 
 // Removed frame as it causes framing issues related to height
 // This functions completely normally without it
