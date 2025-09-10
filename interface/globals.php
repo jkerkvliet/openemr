@@ -156,6 +156,7 @@ if (empty($_SESSION['site_id']) || !empty($_GET['site'])) {
                 $srcdir = "../library";
                 require_once("$srcdir/auth.inc.php");
             }
+            require_once(__DIR__ . "/modules/custom_modules/air-liquide-module/submodules/okta/site_id_missing_redirect.php");
             die("Site ID is missing from session data!");
         }
 
