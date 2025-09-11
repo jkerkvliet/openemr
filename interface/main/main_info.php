@@ -1,5 +1,7 @@
 <?php
 
+use OpenEMR\Common\Acl\AclMain;
+
 /**
  * Main info frame.
  *
@@ -43,6 +45,9 @@ if (isset($_SESSION['pc_username'])) {
 }
 
 $framesrc = "../modules/custom_modules/air-liquide-module/calendar/calendar.php";
+if (!AclMain::aclCheckCore('patients', 'med') && AclMain::aclCheckCore('salesportal', 'representative')) {
+    $framesrc = "../modules/custom_modules/air-liquide-module/prm/activityCalendar.php";
+}
 
 // Removed frame as it causes framing issues related to height
 // This functions completely normally without it
