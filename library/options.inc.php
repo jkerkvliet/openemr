@@ -3600,7 +3600,7 @@ function display_layout_rows($formtype, $result1, $result2 = '')
             }
 
             // filter out all the empty field data from the patient report.
-            if (!empty($currvalue) && !($currvalue == '0000-00-00 00:00:00')) {
+            if (true) { // need to keep structure, even if empty
                 // Handle starting of a new row.
                 if (($titlecols > 0 && $cell_count >= $CPR) || $cell_count == 0 || $prepend_blank_row || $jump_new_row) {
                     disp_end_row();
@@ -3641,11 +3641,11 @@ function display_layout_rows($formtype, $result1, $result2 = '')
                 if (!$span_col_row) {
                     // Added 5-09 by BM - Translate label if applicable
                     if ($frow['title']) {
-                        $tmp = xl_layout_label($frow['title']);
+                        $tmp = ' ' . xl_layout_label($frow['title']); // added extra space
                         echo text($tmp);
                         // Append colon only if label does not end with punctuation.
                         if (strpos('?!.,:-=', substr($tmp, -1, 1)) === false) {
-                            echo ':';
+                            echo ': '; // added extra space
                         }
                     } else {
                         echo "&nbsp;";
