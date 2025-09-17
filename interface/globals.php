@@ -142,9 +142,6 @@ if (session_status() === PHP_SESSION_NONE) {
     //error_log("2. FREE ".GetCallingScriptName()); // debug unlocked
 }
 
-require_once(__DIR__ . "/modules/custom_modules/air-liquide-module/submodules/okta/site_id_missing_redirect.php");
-die("Site ID is missing from session data!");
-
 // Set the site ID if required.  This must be done before any database
 // access is attempted.
 if (empty($_SESSION['site_id']) || !empty($_GET['site'])) {
