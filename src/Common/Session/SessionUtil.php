@@ -64,7 +64,7 @@ class SessionUtil
     private const CORE_SESSION_ID = "OpenEMR";
     private const OAUTH_SESSION_ID = 'authserverOpenEMR';
 
-    private static $gc_maxlifetime = 14400;
+    private static $gc_maxlifetime = 43200;
     private static $sid_bits_per_character = 6;
     private static $sid_length = 48;
     private static $use_strict_mode = true;
