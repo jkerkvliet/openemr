@@ -20,10 +20,12 @@ class NewEncounterRenderEvent
      */
     const EVENT_SECTION_RENDER_POST = "new.encounter.render.post";
 
-    private int $pid;
+    private ?int $pid;
+    private ?int $encounterId;
 
-    public function __construct($pid) {
+    public function __construct(?int $pid, ?int $encounterId) {
         $this->pid = $pid;
+        $this->encounterId = $encounterId;
     }
 
     /**
@@ -34,6 +36,11 @@ class NewEncounterRenderEvent
         return $this->pid;
     }
 
+    public function getEncounterId(): ?int
+    {
+        return $this->encounterId;
+    }
+
     /**
      * @param int|null $pid
      * @return NewEncounterRenderEvent
@@ -41,6 +48,16 @@ class NewEncounterRenderEvent
     public function setPid(?int $pid): NewEncounterRenderEvent
     {
         $this->pid = $pid;
+        return $this;
+    }
+
+    /**
+     * @param int|null $encounterId
+     * @return NewEncounterRenderEvent
+     */
+    public function setEncounterId(?int $encounterId): NewEncounterRenderEvent
+    {
+        $this->encounterId = $encounterId;
         return $this;
     }
 }

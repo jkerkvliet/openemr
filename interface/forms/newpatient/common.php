@@ -847,7 +847,11 @@ $ires = sqlStatement("SELECT id, type, title, begdate FROM lists WHERE " .
 </script>
 
 <?php
-    $GLOBALS["kernel"]->getEventDispatcher()->dispatch(new NewEncounterRenderEvent($pid), NewEncounterRenderEvent::EVENT_SECTION_RENDER_POST, 10);
+    $encounterId = null;
+    if ($viewmode) {
+        $encounterId = $id;
+    }
+    $GLOBALS["kernel"]->getEventDispatcher()->dispatch(new NewEncounterRenderEvent($pid, $encounterId), NewEncounterRenderEvent::EVENT_SECTION_RENDER_POST, 10);
 ?>
 
 <?php if (!empty($GLOBALS['text_templates_enabled'])) { ?>
