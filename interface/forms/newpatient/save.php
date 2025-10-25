@@ -22,6 +22,8 @@ use OpenEMR\Services\CodeTypesService;
 use OpenEMR\Services\EncounterService;
 use OpenEMR\Services\FacilityService;
 use OpenEMR\Services\ListService;
+use OpenEMR\Events\Encounter\EncounterCreatedEvent;
+use OpenEMR\Events\Encounter\EncounterUpdatedEvent;
 
 if (!CsrfUtils::verifyCsrfToken($_POST["csrf_token_form"])) {
     CsrfUtils::csrfNotVerified();
@@ -122,12 +124,28 @@ if ($mode == 'new') {
     $enc_id = sqlInsert($sql, array_values($data));
 
     addForm($encounter, "New Patient Encounter", $enc_id, "newpatient", $pid, $userauthorized, $date);
+
+    // Dispatch encounter created event
+    $encounterCreatedEvent = new EncounterCreatedEvent(
+        $enc_id,
+        $encounter,
+        $pid,
+        $provider_id,
+        $facility_id,
+        $pc_catid,
+        $date,
+        $reason
+    );
+    $GLOBALS['kernel']->getEventDispatcher()->dispatch($encounterCreatedEvent, EncounterCreatedEvent::EVENT_HANDLE);
 } elseif ($mode == 'update') {
     $id = $_POST["id"];
     $result = sqlQuery("SELECT encounter, sensitivity FROM form_encounter WHERE id = ?", array($id));
     if ($result['sensitivity'] && !AclMain::aclCheckCore('sensitivities', $result['sensitivity'])) {
         die(xlt("You are not authorized to see this encounter."));
     }
+
+    // Get old encounter data before update
+    $oldEncounterData = sqlQuery("SELECT * FROM form_encounter WHERE id = ?", array($id));
 
     $encounter = $result['encounter'];
     // See view.php to allow or disallow updates of the encounter date.
@@ -178,6 +196,19 @@ if ($mode == 'new') {
         'ordering_provider_id',
     ]) . " =?";
     sqlStatement("UPDATE form_encounter SET $datepart $col_string WHERE id = ?", $sqlBindArray);
+
+    // Get new encounter data after update
+    $newEncounterData = sqlQuery("SELECT * FROM form_encounter WHERE id = ?", array($id));
+
+    // Dispatch encounter updated event
+    $encounterUpdatedEvent = new EncounterUpdatedEvent(
+        $id,
+        $encounter,
+        $pid,
+        $oldEncounterData,
+        $newEncounterData
+    );
+    $GLOBALS['kernel']->getEventDispatcher()->dispatch($encounterUpdatedEvent, EncounterUpdatedEvent::EVENT_HANDLE);
 } else {
     die("Unknown mode '" . text($mode) . "'");
 }

@@ -25,6 +25,7 @@ use OpenEMR\Common\Crypto\CryptoGen;
 use OpenEMR\Common\ORDataObject\ORDataObject;
 use OpenEMR\Common\Uuid\UuidRegistry;
 use OpenEMR\Events\PatientDocuments\PatientDocumentStoreOffsite;
+use OpenEMR\Events\PatientDocuments\PatientDocumentCreatedEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class Document extends ORDataObject
@@ -1111,6 +1112,20 @@ class Document extends ORDataObject
             $sql = "REPLACE INTO categories_to_documents SET category_id = ?, document_id = ?";
             $this->_db->Execute($sql, array($category_id, $this->get_id()));
         }
+
+        // Dispatch document created event
+        $documentCreatedEvent = new PatientDocumentCreatedEvent(
+            $this->get_id(),
+            $patient_id,
+            $category_id,
+            $filename,
+            $mimetype,
+            $this->size,
+            $foreign_reference_id,
+            $foreign_reference_table,
+            $this->owner
+        );
+        $this->eventDispatcher->dispatch($documentCreatedEvent, PatientDocumentCreatedEvent::EVENT_HANDLE);
 
         return '';
     }

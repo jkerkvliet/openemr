@@ -26,6 +26,8 @@ use OpenEMR\Common\Csrf\CsrfUtils;
 use OpenEMR\Core\Header;
 use OpenEMR\MedicalDevice\MedicalDevice;
 use OpenEMR\Services\PatientIssuesService;
+use OpenEMR\Events\Patient\PatientIssueCreatedEvent;
+use OpenEMR\Events\Patient\PatientIssueUpdatedEvent;
 
 // TBD - Resolve functional issues if opener is included in Header
 ?>
@@ -286,13 +288,41 @@ if (!empty($_POST['form_save'])) {
 
     $patientIssuesService = new PatientIssuesService();
     if ($issue) {
+        // Get old issue data before update
+        $oldIssueData = $patientIssuesService->getOneById($issue);
+
         $patientIssuesService->updateIssue($issueRecord);
+
+        // Get new issue data after update
+        $newIssueData = $patientIssuesService->getOneById($issue);
+
+        // Dispatch issue updated event
+        $issueUpdatedEvent = new PatientIssueUpdatedEvent(
+            $issue,
+            $thispid,
+            $text_type,
+            $oldIssueData,
+            $newIssueData
+        );
+        $GLOBALS['kernel']->getEventDispatcher()->dispatch($issueUpdatedEvent, PatientIssueUpdatedEvent::EVENT_HANDLE);
     } else {
         $issueRecord["date"] = date("Y-m-d H:m:s");
         $issueRecord['activity'] = 1;
         $issueRecord['user'] = $_SESSION['authUser'];
         $issueRecord['groupname'] = $_SESSION['authProvider'];
-        $patientIssuesService->createIssue($issueRecord);
+        $issue = $patientIssuesService->createIssue($issueRecord);
+
+        // Dispatch issue created event
+        $issueCreatedEvent = new PatientIssueCreatedEvent(
+            $issue,
+            $thispid,
+            $text_type,
+            $issueRecord['title'],
+            $issueRecord['begdate'] ?? null,
+            $issueRecord['diagnosis'] ?? null,
+            $issueRecord['comments'] ?? null
+        );
+        $GLOBALS['kernel']->getEventDispatcher()->dispatch($issueCreatedEvent, PatientIssueCreatedEvent::EVENT_HANDLE);
     }
 
     // For record/reporting purposes, place entry in lists_touch table.
