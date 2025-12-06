@@ -25,6 +25,8 @@ use OpenEMR\Services\FacilityService;
 use OpenEMR\Services\PatientService;
 use OpenEMR\Events\PatientDocuments\PatientDocumentTreeViewFilterEvent;
 use OpenEMR\Events\PatientDocuments\PatientRetrieveOffsiteDocument;
+use OpenEMR\Events\PatientDocuments\PatientDocumentViewedEvent;
+use OpenEMR\Events\PatientDocuments\PatientDocumentUpdatedEvent;
 
 class C_Document extends Controller
 {
@@ -611,6 +613,23 @@ class C_Document extends Controller
 
         $d = new Document($document_id);
 
+        // Dispatch document viewed event (get category info first)
+        $categoryInfo = sqlQuery("SELECT c.category_id, cat.name as category_name
+                                  FROM categories_to_documents c
+                                  LEFT JOIN categories cat ON cat.id = c.category_id
+                                  WHERE c.document_id = ?", [$document_id]);
+        if ($GLOBALS['kernel'] && $d->get_foreign_id() && $context != "patient_picture") {
+            $event = new PatientDocumentViewedEvent(
+                $document_id,
+                $d->get_foreign_id(),
+                $d->get_name(),
+                $d->get_mimetype(),
+                $categoryInfo['category_id'] ?? null,
+                $categoryInfo['category_name'] ?? ''
+            );
+            $GLOBALS['kernel']->getEventDispatcher()->dispatch($event, PatientDocumentViewedEvent::EVENT_HANDLE);
+        }
+
         // ensure user/patient has access
         if (isset($_SESSION['patient_portal_onsite_two']) && isset($_SESSION['pid'])) {
             // ensure patient has access (called from patient portal)
@@ -925,10 +944,42 @@ class C_Document extends Controller
 
         //move to new category
         if (is_numeric($new_category_id) && is_numeric($document_id)) {
+            // Get old category info before the move
+            $oldCategoryInfo = sqlQuery("SELECT c.category_id, cat.name as category_name
+                                         FROM categories_to_documents c
+                                         LEFT JOIN categories cat ON cat.id = c.category_id
+                                         WHERE c.document_id = ?", [$document_id]);
+
+            // Get document info
+            $docInfo = sqlQuery("SELECT id, foreign_id, name FROM documents WHERE id = ?", [$document_id]);
+
             $sql = "UPDATE categories_to_documents set category_id = ? where document_id = ?";
             $messages .= xl('Document moved to new category', '', '', ' \'') . $this->tree->_id_name[$new_category_id]['name']  . xl('successfully.', '', '\' ') . "\n";
             //echo $sql;
             $this->tree->_db->Execute($sql, [$new_category_id, $document_id]);
+
+            // Dispatch document updated event for category change
+            if ($GLOBALS['kernel'] && $docInfo && $oldCategoryInfo) {
+                $oldData = [
+                    'document_name' => $docInfo['name'],
+                    'category_id' => $oldCategoryInfo['category_id'],
+                    'category_name' => $oldCategoryInfo['category_name']
+                ];
+
+                $newData = [
+                    'document_name' => $docInfo['name'],
+                    'category_id' => $new_category_id,
+                    'category_name' => $this->tree->_id_name[$new_category_id]['name']
+                ];
+
+                $event = new PatientDocumentUpdatedEvent(
+                    $docInfo['id'],
+                    $docInfo['foreign_id'],
+                    $oldData,
+                    $newData
+                );
+                $GLOBALS['kernel']->getEventDispatcher()->dispatch($event, PatientDocumentUpdatedEvent::EVENT_HANDLE);
+            }
         }
 
         //move to new patient
@@ -1053,6 +1104,14 @@ class C_Document extends Controller
         if (is_numeric($document_id)) {
             $messages = '';
             $d = new Document($document_id);
+
+            // Get old data before updates for audit log
+            $oldData = [
+                'document_name' => $d->get_name(),
+                'document_date' => $d->get_docdate(),
+                'issue_id' => $d->get_list_id()
+            ];
+
             $file_name = $d->get_name();
             if (
                 $docname != '' &&
@@ -1083,6 +1142,25 @@ class C_Document extends Controller
                 $this->tree->_db->Execute($sql, [$docdate, $issue_id, $document_id]);
             }
             $messages .= xl('Document date and issue updated successfully') . "\n";
+
+            // Get new data after updates for audit log
+            $d->populate(); // Refresh to get updated values
+            $newData = [
+                'document_name' => $d->get_name(),
+                'document_date' => $d->get_docdate(),
+                'issue_id' => $d->get_list_id()
+            ];
+
+            // Dispatch document updated event if there were actual changes
+            if ($GLOBALS['kernel'] && $oldData != $newData) {
+                $event = new PatientDocumentUpdatedEvent(
+                    $document_id,
+                    $d->get_foreign_id(),
+                    $oldData,
+                    $newData
+                );
+                $GLOBALS['kernel']->getEventDispatcher()->dispatch($event, PatientDocumentUpdatedEvent::EVENT_HANDLE);
+            }
         }
 
         $this->_state = false;

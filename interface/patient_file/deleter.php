@@ -23,6 +23,7 @@ use OpenEMR\Common\Acl\AclMain;
 use OpenEMR\Common\Csrf\CsrfUtils;
 use OpenEMR\Common\Logging\EventAuditLogger;
 use OpenEMR\Core\Header;
+use OpenEMR\Events\PatientDocuments\PatientDocumentDeletedEvent;
 
 if (!empty($_GET)) {
     if (!CsrfUtils::verifyCsrfToken($_GET["csrf_token_form"])) {
@@ -180,9 +181,29 @@ function form_delete($formdir, $formid, $patient_id, $encounter_id)
 //
 function delete_document($document)
 {
+    // Get document details before deletion for event dispatch
+    $docInfo = sqlQuery("SELECT d.id, d.foreign_id, d.name, d.mimetype, c.category_id, cat.name as category_name
+                         FROM documents d
+                         LEFT JOIN categories_to_documents c ON c.document_id = d.id
+                         LEFT JOIN categories cat ON cat.id = c.category_id
+                         WHERE d.id = ?", [$document]);
+
     sqlStatement("UPDATE `documents` SET `deleted` = 1 WHERE id = ?", [$document]);
     row_delete("categories_to_documents", "document_id = '" . add_escape_custom($document) . "'");
     row_delete("gprelations", "type1 = 1 AND id1 = '" . add_escape_custom($document) . "'");
+
+    // Dispatch document deleted event
+    if ($docInfo && $GLOBALS['kernel']) {
+        $event = new PatientDocumentDeletedEvent(
+            $docInfo['id'],
+            $docInfo['foreign_id'],
+            $docInfo['name'],
+            $docInfo['mimetype'],
+            $docInfo['category_id'],
+            $docInfo['category_name']
+        );
+        $GLOBALS['kernel']->getEventDispatcher()->dispatch($event, PatientDocumentDeletedEvent::EVENT_HANDLE);
+    }
 }
 ?>
 <html>
