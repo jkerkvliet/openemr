@@ -916,7 +916,7 @@ if (
                     <div class="row">
                         <div class="col-12">
                             <h3>
-                                <?php echo text($formtitle);
+                                <?php echo text(xl($formtitle));
                                 if ($is_core) {
                                     echo " " . xlt('for') . ' ';
                                     echo text($enrow['fname'] ?? '') . ' ' . text($enrow['mname'] ?? '') . ' ' . text($enrow['lname'] ?? '');
