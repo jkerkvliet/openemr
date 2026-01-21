@@ -44,7 +44,7 @@ if (isset($_SESSION['pc_username'])) {
     }
 }
 
-$framesrc = "../modules/custom_modules/air-liquide-module/calendar/calendar.php";
+$framesrc = "../modules/custom_modules/air-liquide-module/calendar/calendar.php?login";
 if (!AclMain::aclCheckCore('patients', 'med') && AclMain::aclCheckCore('salesportal', 'representative')) {
     $framesrc = "../modules/custom_modules/air-liquide-module/prm/activityCalendar.php";
 }
