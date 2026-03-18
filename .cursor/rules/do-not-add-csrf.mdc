@@ -1,0 +1,7 @@
+---
+alwaysApply: true
+---
+
+Do not add CSRF token handling to new things you create.  You don't have to remove it from places it already exists, but don't add it to new ones.  You can disobey this rule and add it when the endpoint you're trying to hit wasn't created by you and requires one (i.e. for example the expand/collapse widgets in the chart).
+
+Also don't use $_SESSION['pid'] - always find a way to pass it along

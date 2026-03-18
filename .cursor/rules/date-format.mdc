@@ -1,0 +1,4 @@
+---
+alwaysApply: true
+---
+Do not ever use m/d/Y for date format - in these situations, use Y-m-d for date, but feel free to use longer forms when you want to write out the month.

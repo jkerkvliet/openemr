@@ -36,3 +36,4 @@ interface/modules/custom_modules/*
 
 # cursor
 .cursor/*
+!.cursor/rules/

@@ -1,0 +1,6 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+Don't use error_log - I can't see the error logs anywhere with my setup.  We have to either console.log or echo things out for those kinds of tests.

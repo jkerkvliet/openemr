@@ -1,0 +1,18 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# STRICT EDIT POLICY
+
+1. MAKE ONLY THE SPECIFIC CHANGES REQUESTED IN THE USER QUERY
+   - Do not touch ANY other code, even if unfamiliar or seemingly unused
+   - Do not "clean up", "improve", or remove ANY code not directly related to the request
+   - Leave ALL existing code intact unless explicitly told to modify it
+
+2. When uncertain about any code:
+   - Assume it is necessary
+   - Do not remove or modify it
+   - Ask the user about it rather than making assumptions
+
+3. ANY deletion or modification must be DIRECTLY related to the user's explicit request
