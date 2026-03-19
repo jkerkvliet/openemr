@@ -1,0 +1,21 @@
+---
+description: All changes should stay inside the air-liquide-module; use OpenEMR events to hook into core
+alwaysApply: true
+---
+
+# Module Boundary — Keep Changes Inside air-liquide-module
+
+All code changes must go inside `interface/modules/custom_modules/air-liquide-module/`.
+
+**Do NOT modify files in the core OpenEMR codebase** (anything outside the module directory) without explicitly asking the user first. If you need to hook into core behavior, follow the event-driven approach below.
+
+## How to Extend Core OpenEMR
+
+1. **Check `src/Events/` for an existing event** that fires at the hook point you need (e.g. `AppointmentSetEvent`, `EncounterCreatedEvent`, `PatientDocumentCreatedEvent`).
+2. **If an event already exists**, listen to it in `interface/modules/custom_modules/air-liquide-module/openemr.bootstrap.php` via `$eventDispatcher->addListener(...)`. No core changes needed. All event listeners must be placed in this file.
+3. **If no suitable event exists**, ask the user before proceeding. The pattern is:
+   - Create a new Event class in `src/Events/` (this is the only core change, and requires permission).
+   - Dispatch it from the relevant core file.
+   - Listen to it from `interface/modules/custom_modules/air-liquide-module/openemr.bootstrap.php`.
+
+See `src/Events/Encounter/NewEncounterRenderEvent.php` for an example event class, and the many `$eventDispatcher->addListener(...)` calls in `interface/modules/custom_modules/air-liquide-module/openemr.bootstrap.php` for usage examples.

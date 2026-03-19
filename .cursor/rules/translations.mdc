@@ -1,0 +1,51 @@
+---
+description: How to handle translatable strings in PHP and JavaScript
+alwaysApply: true
+---
+
+# Translations / xl() Wrapping
+
+All user-facing strings must be wrapped with translation functions so the app works in both English and French.
+
+## PHP
+
+- **`xl('String')`** — returns the translated string. Use when assigning to a variable, array, or passing to a function.
+- **`xlt('String')`** — translates and HTML-escapes (via `text()`). Use when outputting directly into HTML content.
+- **`xla('String')`** — translates and attribute-escapes (via `attr()`). Use inside HTML attributes.
+- **`xlj('String')`** — translates and JS-escapes (via `js_escape()`). Use inside inline `<script>` blocks.
+
+```php
+// Variable / array assignment
+$label = xl('Funding Details');
+
+// HTML content
+echo '<h2>' . xlt('Patient Name') . '</h2>';
+<?php echo xlt('Save'); ?>
+
+// HTML attribute
+echo '<input placeholder="' . xla('Search') . '">';
+
+// Inline JS in PHP
+echo '<script>alert(' . xlj('Are you sure?') . ');</script>';
+```
+
+## JavaScript
+
+In standalone JS (not inline PHP), use the global `xl()` function from `utility.js` which calls `i18next.t()`:
+
+```javascript
+const label = xl('Funding Details');
+```
+
+## Adding New Translations
+
+When you add a new user-facing string wrapped in `xl()`:
+
+1. Add the English key and its French translation to the `$englishToFrench` array in `interface/modules/custom_modules/air-liquide-module/commands/update_translations.php`.
+2. The key must exactly match the string passed to `xl()` / `xlt()` / `xla()` / `xlj()`.
+
+## What NOT to Wrap
+
+- Database column names, internal identifiers, CSS classes, URLs
+- Strings only used in code logic (not displayed to users)
+- Strings that are already dynamic / come from the database
