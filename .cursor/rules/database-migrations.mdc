@@ -1,0 +1,18 @@
+---
+description: When making database schema changes, always provide a copy/pasteable migration SQL block
+alwaysApply: true
+---
+
+# Database Migrations
+
+When you add, remove, or modify columns/indexes/tables in the database (including changes to `schema.sql`), you **must** also provide the raw migration SQL as a copy/pasteable code block in your response.
+
+The user cannot run `schema.sql` directly — it's a reference file that updates on its own. The migration SQL is what actually gets executed against the live database.
+
+Example:
+
+```sql
+ALTER TABLE prm_providers 
+ADD COLUMN legacy_id_2 varchar(100) DEFAULT NULL AFTER legacy_id,
+ADD KEY legacy_id_2_index (legacy_id_2);
+```

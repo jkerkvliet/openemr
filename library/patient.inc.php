@@ -1189,7 +1189,7 @@ function updatePatientData($pid, $new, $create = false)
         $pid === null
     ) {
         $result = $patientService->databaseInsert($new);
-        updateDupScore($result['pid']);
+        // updateDupScore($result['pid']);
     } else {
         $new['pid'] = $pid;
         $result = $patientService->databaseUpdate($new);
